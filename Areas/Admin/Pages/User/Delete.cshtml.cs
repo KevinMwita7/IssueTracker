@@ -18,7 +18,7 @@ namespace IssueTracker.Areas.Admin.Pages.User
         }
 
         [BindProperty]
-      public IdentityUser SelectedUser { get; set; } = default!;
+        public IdentityUser SelectedUser { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string? id)
         {
@@ -47,11 +47,21 @@ namespace IssueTracker.Areas.Admin.Pages.User
                 return NotFound();
             }
             var user = await _userManager.FindByIdAsync(id);
+            var loggedInUser = await _userManager.GetUserAsync(HttpContext.User);
+
 
             if (user != null)
             {
-                SelectedUser = user;
-                await _userManager.DeleteAsync(user);
+                // Don't allow admin to delete themselves. Can only be done by
+                // another admin. This is to prevent the site from remaining without
+                // an admin. Other approach would be counting admins in DB and if count
+                // exceeds 1 proceed with deletion
+                if(user.Id != loggedInUser.Id) await _userManager.DeleteAsync(user);
+                else {
+                    SelectedUser = user;
+                    ModelState.AddModelError(string.Empty, "You can't delete your own account. It has to be done by another admin!");
+                    return Page();
+                }
             }
 
             return RedirectToPage("./Index");
