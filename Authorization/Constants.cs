@@ -7,6 +7,7 @@ namespace IssueTracker.Authorization {
         public const string UpdateOperationName = "Update";
         public const string DeleteOperationName = "Delete";
         public const string AdministratorsRole = "Administrator";
+        public const string ProjectManagerRole = "ProjectManager";
     }
 
         public static class ContactOperations
