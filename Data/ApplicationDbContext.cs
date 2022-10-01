@@ -6,6 +6,9 @@ namespace IssueTracker.Data;
 
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
+
+    public DbSet<Project> Projects { get; set; }
+    
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
