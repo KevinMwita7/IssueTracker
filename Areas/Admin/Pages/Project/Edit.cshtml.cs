@@ -49,10 +49,12 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return Page();
             }
 
-            _context.Attach(Project).State = EntityState.Modified;
-
+            Project.UpdatedAt = DateTime.UtcNow;
             try
             {
+                // Mark fields that need to be updated
+                _context.Entry(Project).Property(m => m.UpdatedAt).IsModified = true;
+                _context.Entry(Project).Property(m => m.Name).IsModified = true;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
