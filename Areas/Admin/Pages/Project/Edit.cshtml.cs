@@ -37,6 +37,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return NotFound();
             }
             Project = project;
+           ViewData["UserId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
             return Page();
         }
 
@@ -49,12 +50,10 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return Page();
             }
 
-            Project.UpdatedAt = DateTime.UtcNow;
+            _context.Attach(Project).State = EntityState.Modified;
+
             try
             {
-                // Mark fields that need to be updated
-                _context.Entry(Project).Property(m => m.UpdatedAt).IsModified = true;
-                _context.Entry(Project).Property(m => m.Name).IsModified = true;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
