@@ -9,5 +9,9 @@ namespace IssueTracker.Data {
         public DateTime CreatedAt { get; set; }
         [Required]
         public DateTime UpdatedAt {get; set;}
+        [Required]
+        public string UserId { get; set; }
+        [Required]
+        public ApplicationUser User { get; set; }
     }
 }
