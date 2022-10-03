@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PasswordGenerator;
+using IssueTracker.Data;
 
 namespace IssueTracker.Areas.Admin.Pages.User
 {
@@ -16,9 +17,9 @@ namespace IssueTracker.Areas.Admin.Pages.User
     public class CreateUserModel : PageModel
     {
         private readonly ILogger<CreateUserModel> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CreateUserModel(ILogger<CreateUserModel> logger, UserManager<IdentityUser> userManager)
+        public CreateUserModel(ILogger<CreateUserModel> logger, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _userManager = userManager;
@@ -100,7 +101,7 @@ namespace IssueTracker.Areas.Admin.Pages.User
                 var pwd = new Password().Next();
 
                 if (user == null) {
-                    var newUser = new IdentityUser {
+                    var newUser = new ApplicationUser {
                         UserName = Input.Username,
                         Email = Input.Email,
                         PhoneNumber = Input.PhoneNumber

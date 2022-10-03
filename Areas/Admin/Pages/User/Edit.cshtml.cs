@@ -9,17 +9,17 @@ namespace IssueTracker.Areas.Admin.Pages.User
     [Authorize(Roles = "Administrator")]
     public class EditUserModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public EditUserModel(UserManager<IdentityUser> userManager, ApplicationDbContext context)
+        public EditUserModel(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
         }
 
         [BindProperty]
-        public IdentityUser SelectedUser { get; set; } = default!;
+        public ApplicationUser SelectedUser { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string? id)
         {

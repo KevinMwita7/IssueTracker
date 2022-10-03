@@ -9,16 +9,16 @@ namespace IssueTracker.Areas.Admin.Pages.User
     public class DeleteUserModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DeleteUserModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public DeleteUserModel(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
         [BindProperty]
-        public IdentityUser SelectedUser { get; set; } = default!;
+        public ApplicationUser SelectedUser { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string? id)
         {

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IssueTracker.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
 
     public DbSet<Project> Projects { get; set; }
