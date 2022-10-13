@@ -11,7 +11,7 @@ namespace IssueTracker.Data {
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt {get; set;}
         // Foreign keys and navigation properties. Read more at https://learn.microsoft.com/en-us/ef/core/modeling/relationships
-        public Guid UserId { get; set; }
+        public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
         
         public List<Swimlane>? Swimlanes { get; set; }
