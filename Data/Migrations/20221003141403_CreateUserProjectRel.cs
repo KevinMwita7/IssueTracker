@@ -11,9 +11,7 @@ namespace IssueTracker.Data.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "UserId",
                 table: "Projects",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
+                type: "text");
 
             migrationBuilder.AddColumn<string>(
                 name: "Discriminator",

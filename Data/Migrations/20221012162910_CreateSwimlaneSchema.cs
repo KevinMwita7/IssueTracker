@@ -9,18 +9,6 @@ namespace IssueTracker.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Projects_AspNetUsers_UserId",
-                table: "Projects");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "UserId",
-                table: "Projects",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text");
-
             migrationBuilder.CreateTable(
                 name: "Swimlane",
                 columns: table => new
@@ -46,41 +34,13 @@ namespace IssueTracker.Data.Migrations
                 name: "IX_Swimlane_ProjectId",
                 table: "Swimlane",
                 column: "ProjectId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Projects_AspNetUsers_UserId",
-                table: "Projects",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Projects_AspNetUsers_UserId",
-                table: "Projects");
-
             migrationBuilder.DropTable(
                 name: "Swimlane");
 
-            // migrationBuilder.AlterColumn<string>(
-            //     name: "UserId",
-            //     table: "Projects",
-            //     type: "text",
-            //     nullable: false,
-            //     defaultValue: "",
-            //     oldClrType: typeof(string),
-            //     oldType: "text",
-            //     oldNullable: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Projects_AspNetUsers_UserId",
-                table: "Projects",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }
