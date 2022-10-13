@@ -1,15 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace IssueTracker.Data {
     public class Project {
         public Guid Id {get; set; }
-        [Required]
         public string Name { get; set; }
-        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
-        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt {get; set;}
-        public string? UserId { get; set; }
+        // Foreign keys and navigation properties. Read more at https://learn.microsoft.com/en-us/ef/core/modeling/relationships
+        public Guid UserId { get; set; }
         public ApplicationUser? User { get; set; }
+        
+        public List<Swimlane>? Swimlanes { get; set; }
     }
 }

@@ -29,8 +29,8 @@
             </div>
             <div class="my-2"></div>
             <div class="form-group">
-                <label for="swimlanes" class="control-label">Swimlanes</label>
-                <input id="swimlanes" class="form-control" name="swimlanes">
+                <label for="Swimlanes" class="control-label">Swimlanes</label>
+                <input id="Swimlanes" class="form-control" name="Swimlanes">
             </div>
             <div class="my-2"></div>
             <div class="form-group">
@@ -44,11 +44,14 @@
     <script src="~/lib/tagify/tagify.min.js"></script>
     <script src="~/lib/tagify/tagify.polyfill.min.js"></script>
     <script>
-        var inputEl = document.querySelector("input[name=swimlanes]");
-        var tagify = new Tagify (inputEl);
+        var inputEl = document.querySelector("input[name=Swimlanes]");
+        var tagify = new Tagify (inputEl, {
+            trim: true,
+            originalInputValueFormat: items => JSON.stringify(items.map(item => {
+                return { "Name": item.value }
+            }))
+        });
         
-        tagify.addTags(["banana", "orange", "apple"]);
-
         inputEl.addEventListener('change', onChange)
 
         function onChange(e) {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -31,6 +32,9 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
 
         [BindProperty]
         public Project Project { get; set; } = default!;
+
+        [BindProperty]
+        public string? Swimlanes { get; set; }
         
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
@@ -41,10 +45,17 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return Page();
             }
 
-            Project.CreatedAt = DateTime.UtcNow;
-            Project.UpdatedAt = DateTime.UtcNow;
-            Project.UserId = (await _userManager.GetUserAsync(User)).Id;
+            if (!String.IsNullOrEmpty(Swimlanes)) {
+                Project.Swimlanes = new List<Swimlane>();
 
+                foreach (Swimlane swimlane in JsonSerializer.Deserialize<List<Swimlane>>(Swimlanes)) {
+                    Project.Swimlanes.Add(swimlane);
+                }
+            }
+
+            // Project.CreatedAt = DateTime.UtcNow;
+            // Project.UpdatedAt = DateTime.UtcNow;
+            /*Project.UserId = (await _userManager.GetUserAsync(User)).Id;*/
             _context.Projects.Add(Project);
             await _context.SaveChangesAsync();
 
