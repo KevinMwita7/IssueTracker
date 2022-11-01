@@ -50,10 +50,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return Page();
             }
 
-            _context.Entry(Project).Entity.UpdatedAt = DateTime.Now;
-
             _context.Entry(Project).Property(p => p.Name).IsModified = true;
-            _context.Entry(Project).Property(p => p.UpdatedAt).IsModified = true;
 
             try
             {

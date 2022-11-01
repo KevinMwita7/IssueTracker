@@ -8,11 +8,16 @@ namespace IssueTracker.Data;
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
 
-    
+    private AddTimestampsInterceptor _timestampsInterceptor = new AddTimestampsInterceptor();
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    => optionsBuilder
+        .AddInterceptors(_timestampsInterceptor);
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
