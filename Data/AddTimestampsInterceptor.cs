@@ -11,19 +11,22 @@ namespace IssueTracker.Data
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            HandleModified(eventData.Context);
+            AddTimestamps(eventData.Context);
 
             return result;
         }
 
 
-        private static void HandleModified(DbContext context)
+        private static void AddTimestamps(DbContext context)
         {
             context.ChangeTracker.DetectChanges();
 
             foreach (var entry in context.ChangeTracker.Entries<BaseEntity>())
             {
-                if (entry.State == EntityState.Modified) {
+                if (entry.State == EntityState.Added) {
+                    entry.Property(e => e.CreatedAt).CurrentValue = DateTime.UtcNow;
+                    entry.Property(e => e.UpdatedAt).CurrentValue = DateTime.UtcNow;
+                } else if (entry.State == EntityState.Modified) {
                     entry.Property(e => e.UpdatedAt).CurrentValue = DateTime.UtcNow;
                 }
             }
