@@ -53,9 +53,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 }
             }
 
-            // Project.CreatedAt = DateTime.UtcNow;
-            // Project.UpdatedAt = DateTime.UtcNow;
-            /*Project.UserId = (await _userManager.GetUserAsync(User)).Id;*/
+            Project.User = await _userManager.GetUserAsync(User);
             _context.Projects.Add(Project);
             await _context.SaveChangesAsync();
 

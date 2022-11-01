@@ -6,12 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using IssueTracker.Data;
 
-namespace IssueTracker.Areas.Admin.Pages.ManageProject
+namespace IssueTracker.Areas.Admin.Pages.Swimlanes
 {
-    [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
         private readonly IssueTracker.Data.ApplicationDbContext _context;
@@ -22,22 +20,22 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
         }
 
         [BindProperty]
-        public Project Project { get; set; } = default!;
+        public Swimlane Swimlane { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
-            if (id == null || _context.Projects == null)
+            if (id == null || _context.Swimlane == null)
             {
                 return NotFound();
             }
 
-            var project =  await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
-            if (project == null)
+            var swimlane =  await _context.Swimlane.FirstOrDefaultAsync(m => m.Id == id);
+            if (swimlane == null)
             {
                 return NotFound();
             }
-            Project = project;
-           ViewData["UserId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
+            Swimlane = swimlane;
+           ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Id");
             return Page();
         }
 
@@ -50,10 +48,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 return Page();
             }
 
-            _context.Entry(Project).Entity.UpdatedAt = DateTime.Now;
-
-            _context.Entry(Project).Property(p => p.Name).IsModified = true;
-            _context.Entry(Project).Property(p => p.UpdatedAt).IsModified = true;
+            _context.Attach(Swimlane).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +56,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProjectExists(Project.Id))
+                if (!SwimlaneExists(Swimlane.Id))
                 {
                     return NotFound();
                 }
@@ -74,9 +69,9 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             return RedirectToPage("./Index");
         }
 
-        private bool ProjectExists(Guid id)
+        private bool SwimlaneExists(Guid id)
         {
-          return (_context.Projects?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Swimlane?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
