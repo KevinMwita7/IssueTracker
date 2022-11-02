@@ -20,7 +20,7 @@ namespace IssueTracker.Areas.Admin.Pages.Swimlanes
 
         public IActionResult OnGet()
         {
-        ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Id");
+        ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
             return Page();
         }
 

@@ -35,7 +35,6 @@ namespace IssueTracker.Areas.Admin.Pages.Swimlanes
                 return NotFound();
             }
             Swimlane = swimlane;
-           ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Id");
             return Page();
         }
 
@@ -48,7 +47,7 @@ namespace IssueTracker.Areas.Admin.Pages.Swimlanes
                 return Page();
             }
 
-            _context.Attach(Swimlane).State = EntityState.Modified;
+            _context.Entry(Swimlane).Property(s => s.Name).IsModified = true;
 
             try
             {
