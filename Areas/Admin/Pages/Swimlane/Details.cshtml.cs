@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using IssueTracker.Data;
 
 namespace IssueTracker.Areas.Admin.Pages.Swimlanes
 {
+    [Authorize(Roles = "Administrator")]
     public class DetailsModel : PageModel
     {
         private readonly IssueTracker.Data.ApplicationDbContext _context;
