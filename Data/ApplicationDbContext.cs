@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using IssueTracker.Data;
+using IssueTracker.Data.Interceptors;
 
 namespace IssueTracker.Data;
 
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
 
-    private AddTimestampsInterceptor _timestampsInterceptor = new AddTimestampsInterceptor();
+    private OnAddOrUpdateInterceptor _onAddOrUpdateInterceptor = new OnAddOrUpdateInterceptor();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -17,7 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     => optionsBuilder
-        .AddInterceptors(_timestampsInterceptor);
+        .AddInterceptors(_onAddOrUpdateInterceptor);
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

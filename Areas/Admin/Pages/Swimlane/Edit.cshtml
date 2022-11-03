@@ -14,6 +14,7 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Swimlane.Id" />
+            <input type="hidden" asp-for="Swimlane.Version" />
             <div class="form-group">
                 <label asp-for="Swimlane.Name" class="control-label"></label>
                 <input asp-for="Swimlane.Name" class="form-control" />
