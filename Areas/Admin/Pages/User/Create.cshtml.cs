@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using PasswordGenerator;
 using IssueTracker.Data;
 
@@ -18,11 +19,16 @@ namespace IssueTracker.Areas.Admin.Pages.User
     {
         private readonly ILogger<CreateUserModel> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
-        public CreateUserModel(ILogger<CreateUserModel> logger, UserManager<ApplicationUser> userManager)
+        public CreateUserModel(ILogger<CreateUserModel> logger, UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
         }
 
         /// <summary>
@@ -75,6 +81,8 @@ namespace IssueTracker.Areas.Admin.Pages.User
 
             [Phone]
             public string PhoneNumber { get; set; }
+
+            public string Role { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -87,6 +95,8 @@ namespace IssueTracker.Areas.Admin.Pages.User
             returnUrl ??= Url.Content("~/");
 
             ReturnUrl = returnUrl;
+
+            ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name");
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -106,12 +116,19 @@ namespace IssueTracker.Areas.Admin.Pages.User
                         Email = Input.Email,
                         PhoneNumber = Input.PhoneNumber
                     };
+
                     await _userManager.CreateAsync(newUser, pwd);
+
+                    if (!String.IsNullOrEmpty(Input.Role)) {
+                        var IR = await _roleManager.FindByIdAsync(Input.Role);
+                        if (IR != null) await _userManager.AddToRoleAsync(newUser, IR.Name);
+                    }
                     return RedirectToPage("./Index");
                 }
                 ModelState.AddModelError(String.Empty, "Username or email already exists");
             }
 
+            ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name"); // Refresh role list
             // If we got this far, something failed, redisplay form
             return Page();
         }
