@@ -20,7 +20,7 @@ namespace IssueTracker.Authorization
             }
 
             // Administrators can do anything.
-            if (context.User.IsInRole(Constants.AdministratorsRole))
+            if (context.User.IsInRole(Constants.ROLES["AdministratorsRole"]))
             {
                 context.Succeed(requirement);
             }

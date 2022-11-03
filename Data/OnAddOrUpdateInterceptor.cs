@@ -11,13 +11,13 @@ namespace IssueTracker.Data.Interceptors
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            AddTimestamps(eventData.Context);
+            await AddTimestamps(eventData.Context);
 
             return result;
         }
 
 
-        private static void AddTimestamps(DbContext context)
+        private static Task AddTimestamps(DbContext context)
         {
             context.ChangeTracker.DetectChanges();
 
@@ -38,6 +38,8 @@ namespace IssueTracker.Data.Interceptors
                     ++entry.Property(e => e.Version).CurrentValue;
                 }
             }
+
+            return Task.CompletedTask;
         }        
     }
 }

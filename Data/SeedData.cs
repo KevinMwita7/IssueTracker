@@ -12,8 +12,8 @@ static class SeedData {
             // dotnet user-secrets set SeedUserPW <pw>
             // The admin user can do anything
 
+            await EnsureRoles(serviceProvider);
             var adminID = await EnsureUser(serviceProvider, testUserPw, "admin");
-            await EnsureRole(serviceProvider, adminID, Constants.AdministratorsRole);
 
             // SeedDB(context, adminID);
         }
@@ -22,6 +22,11 @@ static class SeedData {
     private static async Task < string > EnsureUser(IServiceProvider serviceProvider,
         string testUserPw, string UserName) {
         var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
+
+        if (userManager == null)
+        {
+           throw new Exception("userManager is null");
+        }
 
         var user = await userManager.FindByNameAsync(UserName);
         if (user == null) {
@@ -36,38 +41,32 @@ static class SeedData {
             throw new Exception("The password is probably not strong enough!");
         }
 
+        await userManager.AddToRoleAsync(user, Constants.ROLES["AdministratorsRole"]);
+
         return user.Id;
     }
 
-    private static async Task < IdentityResult > EnsureRole(IServiceProvider serviceProvider,
-        string uid, string role) {
+    // Ensure default roles such as Admin and ProjectManager exist
+    private static async Task < IdentityResult[]> EnsureRoles(IServiceProvider serviceProvider) {
         var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
 
         if (roleManager == null) {
             throw new Exception("roleManager null");
         }
 
-        IdentityResult IR;
-        if (!await roleManager.RoleExistsAsync(role)) {
-            IR = await roleManager.CreateAsync(new IdentityRole(role));
+        var tasks = new List<Task<IdentityResult>>();
+
+        foreach (string key in Constants.ROLES.Keys) {
+            string role = Constants.ROLES[key];
+
+            if (!await roleManager.RoleExistsAsync(role)) {
+                tasks.Add(
+                    roleManager.CreateAsync(new IdentityRole(role))
+                );
+            }
         }
 
-        var userManager = serviceProvider.GetService < UserManager <ApplicationUser >> ();
-
-        //if (userManager == null)
-        //{
-        //    throw new Exception("userManager is null");
-        //}
-
-        var user = await userManager.FindByIdAsync(uid);
-
-        if (user == null) {
-            throw new Exception("The testUserPw password was probably not strong enough!");
-        }
-
-        IR = await userManager.AddToRoleAsync(user, role);
-
-        return IR;
+        return (await Task.WhenAll(tasks));
     }
 
     /*public static void SeedDB(ApplicationDbContext context, string adminID)
