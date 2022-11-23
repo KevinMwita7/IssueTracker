@@ -27,7 +27,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             if (_context.Projects != null)
             {
                 Project = await _context.Projects
-                .Include(p => p.User).ToListAsync();
+                .Include(p => p.Creator).ToListAsync();
             }
         }
     }

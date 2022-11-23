@@ -117,6 +117,8 @@ namespace IssueTracker.Areas.Admin.Pages.User
                         PhoneNumber = Input.PhoneNumber
                     };
 
+                    Console.WriteLine(Input.Username + ": " + pwd);
+
                     await _userManager.CreateAsync(newUser, pwd);
 
                     if (!String.IsNullOrEmpty(Input.Role)) {

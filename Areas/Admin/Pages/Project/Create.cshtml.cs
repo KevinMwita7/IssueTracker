@@ -53,7 +53,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
                 }
             }
 
-            Project.User = await _userManager.GetUserAsync(User);
+            Project.Creator = await _userManager.GetUserAsync(User);
             _context.Projects.Add(Project);
             await _context.SaveChangesAsync();
 
