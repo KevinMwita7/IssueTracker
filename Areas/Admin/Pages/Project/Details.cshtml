@@ -9,15 +9,18 @@
     <h1>Project</h1>
     <hr />
 
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <ul class="nav nav-tabs" id="projectDetailsTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details-tab-pane" type="button" role="tab" aria-controls="details-tab-pane" aria-selected="true">Details</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members-tab-pane" type="button" role="tab" aria-controls="members-tab-pane" aria-selected="false">Members</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="swimlanes-tab" data-bs-toggle="tab" data-bs-target="#swimlanes-tab-pane" type="button" role="tab" aria-controls="swimlanes-tab-pane" aria-selected="false">Swimlanes</button>
+        </li>
     </ul>
-    <div class="tab-content" id="myTabContent">
+    <div class="tab-content" id="projectDetailsTabContent">
         @* Project details tab *@
         <div class="tab-pane fade show active" id="details-tab-pane" role="tabpanel" aria-labelledby="details-tab" tabindex="0">
             @await Component.InvokeAsync("ProjectDetails", new {
@@ -37,6 +40,16 @@
 
             <div>
                 <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button> |
+                <a asp-page="./Index">Back to List</a>
+            </div>
+        </div>
+        @* Swimlanes tab *@
+        <div class="tab-pane fade" id="swimlanes-tab-pane" role="tabpanel" aria-labelledby="swimlanes-tab" tabindex="0">
+            @await Component.InvokeAsync("ProjectSwimlanes", new {
+                project = Model.Project
+            })
+            <div>
+                @* <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button> | *@
                 <a asp-page="./Index">Back to List</a>
             </div>
         </div>

@@ -68,6 +68,7 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             }
             var project = await _context.Projects
                 .Include(p => p.Members)
+                .Include(p => p.Swimlanes)
                 .FirstOrDefaultAsync(m => m.Id == id);
             return project;
         }
