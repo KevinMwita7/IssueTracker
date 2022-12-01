@@ -1,3 +1,4 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model IssueTracker.Data.Project
 
 <dl class="row">
@@ -26,3 +27,8 @@
         @Html.DisplayFor(model => model.Creator.UserName)
     </dd>
 </dl>
+
+<div>
+    <a asp-area="Admin" asp-page="/Project/Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-area="Admin" asp-page="/Project/Index">Back to List</a>
+</div>

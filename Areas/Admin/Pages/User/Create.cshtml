@@ -30,7 +30,9 @@
                 </div>
                 <div class="form-group mb-3">
                     <label asp-for="Input.Role" class="control-label"></label>
-                    @Html.DropDownList("Input.Role", (SelectList)ViewBag.Roles, "Please choose", new { @class = "form-control" })
+                    <small class="d-block text-info">Leave blank for normal user</small>
+                    @* @Html.DropDownList("Input.Role", (SelectList)ViewBag.Roles, "Please choose", new { @class = "form-control" }) *@
+                    @Html.DropDownList("Input.Role", (SelectList)ViewBag.Roles, "", new { @class = "form-control" })
                 </div>
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Submit</button>

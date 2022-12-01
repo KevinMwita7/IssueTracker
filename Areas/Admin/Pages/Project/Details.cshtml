@@ -26,40 +26,18 @@
             @await Component.InvokeAsync("ProjectDetails", new {
                 project = Model.Project
             })
-
-            <div>
-                <a asp-page="./Edit" asp-route-id="@Model.Project?.Id">Edit</a> |
-                <a asp-page="./Index">Back to List</a>
-            </div>
         </div>
-        @* Project members tab *@
-        <div class="tab-pane fade" id="members-tab-pane" role="tabpanel" aria-labelledby="members-tab" tabindex="0">
-            @await Component.InvokeAsync("ProjectMembers", new {
-                project = Model.Project
-            })
-
-            <div>
-                <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button> |
-                <a asp-page="./Index">Back to List</a>
-            </div>
-        </div>
-        @* Swimlanes tab *@
-        <div class="tab-pane fade" id="swimlanes-tab-pane" role="tabpanel" aria-labelledby="swimlanes-tab" tabindex="0">
-            @await Component.InvokeAsync("ProjectSwimlanes", new {
-                project = Model.Project
-            })
-            <div>
-                @* <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button> | *@
-                <a asp-page="./Index">Back to List</a>
-            </div>
-        </div>
+        @* Project members tab. Will be filled using js *@
+        <div class="tab-pane fade" id="members-tab-pane" role="tabpanel" aria-labelledby="members-tab" tabindex="0"></div>
+        @* Swimlanes tab. Will be filled using js *@
+        <div class="tab-pane fade" id="swimlanes-tab-pane" role="tabpanel" aria-labelledby="swimlanes-tab" tabindex="0"></div>
         @* Add member modal *@
         <div class="modal modal-dialog modal-dialog-centered fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                 <form method="post" asp-page-handler="AddMember" asp-route-id="@Model.Project.Id">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="addMemberModalLabel">Modal title</h1>
+                        <h1 class="modal-title fs-5" id="addMemberModalLabel">Add member</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -81,6 +59,32 @@
 </div>
 
 @section Scripts {
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/sortable.min.js"></script>
+    <script>
+        const tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        const spinner = `<div class="d-flex justify-content-center align-items-center" style="height: 50vh;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
+
+        tabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', event => {
+                const targetId = event.target.dataset.bsTarget;
+                const endpoint = event.target.id.split("-")[0];
+                updateView(targetId, endpoint);
+            })
+        })
+
+        async function updateView(targetId, endpoint) {
+            const target = $(targetId);
+            target.html(spinner);
+            const url = new URL(window.location.href);
+            const queryParams = new URLSearchParams(url.search);
+            try {
+                let response = await fetch(`/api/project/${endpoint}?id=${queryParams.get("id")}`);
+                let newHtml = await response.text();
+                target.empty();
+                target.html(newHtml);
+            } catch(e) {
+                console.log(e);
+            }
+        }
+    </script>
 }

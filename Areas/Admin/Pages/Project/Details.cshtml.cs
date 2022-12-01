@@ -66,10 +66,8 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             if (id == null || _context.Projects == null) {
                 return null;
             }
-            var project = await _context.Projects
-                .Include(p => p.Members)
-                .Include(p => p.Swimlanes)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
+
             return project;
         }
     }

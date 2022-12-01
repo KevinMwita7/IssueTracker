@@ -20,14 +20,21 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
             _context = context;
         }
 
-        public IList<Project> Project { get;set; } = default!;
+        public IList<Project> Projects { get;set; } = default!;
+        public Project Project { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(Guid? id)
         {
-            if (_context.Projects != null)
-            {
-                Project = await _context.Projects
-                .Include(p => p.Creator).ToListAsync();
+            if (_context.Projects != null) {
+                if (id != null) {
+                    Console.WriteLine("--------------------------");
+                    Console.WriteLine(id);
+                    Console.WriteLine("--------------------------");
+                    Project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+                } else {
+                    Projects = await _context.Projects
+                    .Include(p => p.Creator).ToListAsync();
+                }
             }
         }
     }
