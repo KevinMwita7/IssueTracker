@@ -23,7 +23,10 @@
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
                     <td>
-                        <a asp-page="/Admin/Project/Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-area="Admin" asp-page="/Swimlane/Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-area="Admin" asp-page="/Swimlane/Details" asp-route-id="@item.Id">Details</a> |
+                        @* <a asp-area="Admin" asp-page="/Swimlane/Delete" asp-route-id="@item.Id" class="delete">Delete</a> *@
+                        <span class="delete link-primary text-decoration-underline" style="cursor: pointer;" data-swimlane-id="@item.Id">Remove</span>
                     </td>
                 </tr>
         }
@@ -31,6 +34,5 @@
 </table>
 
 <div>
-    @* <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Member</button> | *@
-    <a asp-area="Admin" asp-page="/Project/Index">Back to List</a>
+    @* <button type="button" class="btn btn-link p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#addMemberModal">Add Swimlane</button> | *@
 </div>

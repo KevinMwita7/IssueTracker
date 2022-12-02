@@ -82,9 +82,24 @@
                 let newHtml = await response.text();
                 target.empty();
                 target.html(newHtml);
+                attachEventListeners(endpoint);
             } catch(e) {
                 console.log(e);
             }
+        }
+
+        async function attachEventListeners(endpoint) {
+            const url = new URL(window.location.href);
+            const queryParams = new URLSearchParams(url.search);
+            // Remove plural s from endpoint
+            const newEndpoint = endpoint.substring(0, endpoint.length - 1);
+
+            $(".delete").click(async e => {
+                // Update DOM
+                $(e.target).closest("tr").remove();
+                // Send HTTP delete request
+                await fetch(`/api/project/${newEndpoint}?projectId=${queryParams.get("id")}&swimlaneId=${event.target.dataset.swimlaneId}`, { method: "DELETE" });
+            });
         }
     </script>
 }
