@@ -37,38 +37,13 @@ namespace IssueTracker.Areas.Admin.Pages.ManageProject
         }
 
         public async Task<IActionResult> OnGetAsync(Guid? id) {
-            var project = await LoadProject(id);
-            if (project == null) return NotFound();
-            Project = project;
-            ViewData["UserId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "UserName");
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostAddMember(Guid? id) {
-            var project = await LoadProject(id);
-            if (project == null) return NotFound();
-            Project = project;
-            ViewData["UserId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "UserName");
-
-            if (ModelState.IsValid) {
-                var user = await _userManager.FindByIdAsync(Input.UserId);
-                // Don't add user to context if they already exist in order to avoid
-                // duplicates from being displayed in the members section
-                if (user != null && !project.Members.Exists(m => m.Id == user.Id)) {
-                    project.Members.Add(user);
-                    await _context.SaveChangesAsync();
-                }
-            }
-            return Page();
-        }
-
-        private async Task<Project> LoadProject(Guid? id) {
             if (id == null || _context.Projects == null) {
-                return null;
+                return NotFound();
             }
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
-
-            return project;
+            if (project == null) return NotFound();
+            Project = project;
+            return Page();
         }
     }
 }

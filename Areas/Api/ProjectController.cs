@@ -1,17 +1,27 @@
 using IssueTracker.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 
 namespace IssueTracker.Areas.Api {    
     [Area("Api")]
     [Authorize(Roles = "Administrator,ProjectManager")]
     public class ProjectController : Controller {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProjectController(ApplicationDbContext context) {
+        public ProjectController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) {
             _context = context;
+            _userManager = userManager;
+        }
+
+        public class AddMemberFormModel {
+            public Guid UserId { get; set; }
+            public Guid ProjectId { get; set; }
         }
 
         [HttpGet]
@@ -70,11 +80,31 @@ namespace IssueTracker.Areas.Api {
             return Ok();
         }
 
-        public IActionResult AddMember() {
-            Console.WriteLine("-----------------------");
-            Console.WriteLine("add member");
-            Console.WriteLine("-----------------------");
-            return NotFound();
+        [HttpGet]
+        public IActionResult GetAddMemberForm() {
+            return ViewComponent("ProjectAddMember", new {
+                users = new SelectList(_context.Set<ApplicationUser>(), "Id", "UserName").ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMember([FromForm] AddMemberFormModel body) {
+            if (body.UserId == null || body.ProjectId == null || _context.Projects == null) {
+                return NotFound();
+            }
+            var user = await _userManager.FindByIdAsync(body.UserId.ToString());
+            var project = await _context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefaultAsync(p => p.Id == body.ProjectId);
+
+            if (user == null || project == null) {
+                return NotFound();
+            }
+
+            project.Members.Add(user);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }
