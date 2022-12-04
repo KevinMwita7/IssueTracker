@@ -77,12 +77,16 @@
             const queryParams = new URLSearchParams(url.search);
             // Remove plural s from endpoint
             const newEndpoint = endpoint.substring(0, endpoint.length - 1);
-
+            // Event listener to remove swimlane or member
             $(".delete").click(async e => {
+                queryParams.append("projectId", queryParams.get("id"));
+                queryParams.delete("id");
                 // Update DOM
                 $(e.target).closest("tr").remove();
+                if (e.target.dataset.swimlaneId) queryParams.append("swimlaneId", e.target.dataset.swimlaneId);
+                else queryParams.append("memberId", e.target.dataset.memberId);
                 // Send HTTP delete request
-                await fetch(`/api/project/${newEndpoint}?projectId=${queryParams.get("id")}&swimlaneId=${event.target.dataset.swimlaneId}`, { method: "DELETE" });
+                await fetch(`/api/project/${newEndpoint}?${queryParams.toString()}`, { method: "DELETE" });
             });
         }
 

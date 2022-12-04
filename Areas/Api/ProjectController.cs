@@ -73,10 +73,38 @@ namespace IssueTracker.Areas.Api {
 
             var Swimlane = _context.Swimlane.Where(s => s.Id == swimlaneId).Where(s => s.ProjectId == projectId).First();
 
-            if (Swimlane != null) {
-                _context.Swimlane.Remove(Swimlane);
-                await _context.SaveChangesAsync();
+            if (Swimlane == null) {
+                return NotFound();
             }
+
+            _context.Swimlane.Remove(Swimlane);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Member(Guid projectId, Guid memberId) {
+            if (projectId == null || memberId == null || _context.Projects == null) return NotFound();
+
+            var Project = await _context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+            if (Project == null) {
+                return NotFound();
+            }
+
+            var Member = Project.Members.First(m => m.Id == memberId.ToString());
+
+            if (Member == null) {
+                return NotFound();
+            }
+            
+            Project.Members.Remove(Member);
+
+            _context.Projects.Update(Project);
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
