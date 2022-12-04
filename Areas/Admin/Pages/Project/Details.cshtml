@@ -32,7 +32,14 @@
         @* Swimlanes tab. Will be filled using js *@
         <div class="tab-pane fade" id="swimlanes-tab-pane" role="tabpanel" aria-labelledby="swimlanes-tab" tabindex="0"></div>
         @* Add member modal. Content will be loaded via AJAX *@
-        <div class="modal modal-dialog modal-dialog-centered fade" style="display: none;" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+        <div class="modal fade" style="display: none;" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                </div>
+            </div>
+        </div>
+        @* Add swimlane modal. Content will be loaded via AJAX *@
+        <div class="modal fade" style="display: none;" id="addSwimlanesModal" tabindex="-1" aria-labelledby="addSwimlanesModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                 </div>
@@ -47,18 +54,8 @@
         const tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
         const spinner = `<div class="d-flex justify-content-center align-items-center" style="height: 50vh;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
 
-        // Listen for tab click events
-        tabs.forEach(tab => {
-            tab.addEventListener('shown.bs.tab', event => {
-                const targetId = event.target.dataset.bsTarget;
-                const endpoint = event.target.id.split("-")[0];
-                updateView(targetId, endpoint);
-            })
-        })
-
         // Fetch content for current tab and display it
         async function updateView(targetId, endpoint) {
-            console.log(targetId, endpoint);
             const target = $(targetId);
             target.html(spinner);
             const url = new URL(window.location.href);
@@ -89,35 +86,49 @@
             });
         }
 
-        // Fetch add member form
-        const addMemberModal = document.getElementById("addMemberModal");
-        addMemberModal.addEventListener("shown.bs.modal", async e => {
-            // Show spinner
-            $("#addMemberModal .modal-content").html(`<div class="modal-body">${spinner.replace("50vh", "10vh")}</div>`);
-            // Load form using AJAX and attach its event listeners
-            $("#addMemberModal .modal-content").load("/api/project/GetAddMemberForm", (event) => {
-                $("#add-member-form").submit(async evt => {
-                    evt.preventDefault();
-                    // Grab project Id from URL
-                    const url = new URL(window.location.href);
-                    const queryParams = new URLSearchParams(url.search);
-                    // Get form values
-                    const payload = new URLSearchParams();
-                    payload.append("ProjectId", queryParams.get("id"));
-                    $.each($(evt.target).serializeArray(), function(_, field) {
-                        payload.append(field.name, field.value);
-                    });
-                    // Post data
-                    await fetch(`/api/project/AddMember?projectId${queryParams.get("id")}`, { 
-                        method: "POST", 
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: payload
-                    });
-                    // Refresh UI
-                    updateView("#members-tab-pane", "members");
-                })
+        // Fetch add member or swimlane form
+        function fetchForm(subject, elToUpdate) {
+            const addMemberModal = document.getElementById(`add${subject}Modal`);
+            addMemberModal.addEventListener("shown.bs.modal", async e => {
+                // Show spinner
+                $(`#add${subject}Modal .modal-content`).html(`<div class="modal-body">${spinner.replace("50vh", "10vh")}</div>`);
+                // Load form using AJAX and attach its event listeners
+                $(`#add${subject}Modal .modal-content`).load(`/api/project/GetAdd${subject}Form`, (event) => {
+                    $(`#add-${subject.toLowerCase()}-form`).submit(async evt => {
+                        evt.preventDefault();
+                        // Grab project Id from URL
+                        const url = new URL(window.location.href);
+                        const queryParams = new URLSearchParams(url.search);
+                        // Get form values
+                        const payload = new URLSearchParams();
+                        payload.append("ProjectId", queryParams.get("id"));
+                        $.each($(evt.target).serializeArray(), function(_, field) {
+                            if(!payload.has(field.name)) payload.append(field.name, field.value);
+                        });
+                        // Post data
+                        const response = await fetch(`/api/project/Add${subject}?projectId${queryParams.get("id")}`, {
+                            method: "POST", 
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: payload
+                        });
+                        // Refresh UI
+                        if(response.ok) $(elToUpdate).html(await response.text());
+                    })
+                });
             });
-        });
+        }
+
+        // Listen for tab click events
+        tabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', event => {
+                const targetId = event.target.dataset.bsTarget;
+                const endpoint = event.target.id.split("-")[0];
+                updateView(targetId, endpoint);
+            })
+        })
+
+        fetchForm("Member", "#members-tab-pane");
+        fetchForm("Swimlanes", "#swimlanes-tab-pane");
 
     </script>
 }

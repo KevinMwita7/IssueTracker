@@ -24,6 +24,11 @@ namespace IssueTracker.Areas.Api {
             public Guid ProjectId { get; set; }
         }
 
+        public class AddSwimlaneFormModel {
+            public string SwimlaneName { get; set; }
+            public Guid ProjectId { get; set; }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Details(Guid id) {
             if (id == null || _context.Projects == null) return NotFound();
@@ -64,10 +69,6 @@ namespace IssueTracker.Areas.Api {
 
         [HttpDelete]
         public async Task<IActionResult> Swimlane(Guid projectId, Guid swimlaneId) {
-            Console.WriteLine("---------------------------");
-            Console.WriteLine(projectId);
-            Console.WriteLine(swimlaneId);
-            Console.WriteLine("---------------------------");
             if (projectId == null || swimlaneId == null || _context.Swimlane == null) return NotFound();
 
             var Swimlane = _context.Swimlane.Where(s => s.Id == swimlaneId).Where(s => s.ProjectId == projectId).First();
@@ -104,7 +105,53 @@ namespace IssueTracker.Areas.Api {
 
             project.Members.Add(user);
             await _context.SaveChangesAsync();
-            return Ok();
+            return ViewComponent("ProjectMembers", new {
+                project = project
+            });            
+            // return Ok();
+        }
+
+        [HttpGet]
+        public IActionResult GetAddSwimlanesForm() {
+            return ViewComponent("ProjectAddSwimlanes", new {
+                projects = new SelectList(_context.Projects, "Id", "Name").ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSwimlanes([FromForm] AddSwimlaneFormModel body) {
+                        Console.WriteLine("-----------------------------");
+            Console.WriteLine(body.ProjectId);
+            Console.WriteLine(body.SwimlaneName);
+            Console.WriteLine("-----------------------------");
+            if (body.SwimlaneName == null) {
+                return BadRequest();
+            }
+            if (body.ProjectId == null || _context.Projects == null) {
+                return NotFound();
+            }
+
+            var project = await _context.Projects
+                .Include(p => p.Swimlanes)
+                .FirstOrDefaultAsync(p => p.Id == body.ProjectId);
+
+            if (project == null) {
+                return NotFound();
+            }
+
+            var swimlane = project.Swimlanes.FirstOrDefault(s => s.Name == body.SwimlaneName);
+
+            if (swimlane == null) {
+                Swimlane newSwimlane = new Swimlane();
+                newSwimlane.Name = body.SwimlaneName;
+                project.Swimlanes.Add(newSwimlane);
+                await _context.SaveChangesAsync();
+            }
+
+            return ViewComponent("ProjectSwimlanes", new {
+                project = project
+            });;
         }
     }
 }
